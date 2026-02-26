@@ -146,16 +146,48 @@ function ostOnload() {
     }
   })();
 
+  // Extract y-values from a polygon points string, downsample to ~maxPts points,
+  // and normalize to 0-99 integers (0 = no speed, 99 = max speed).
+  function extractGraph(className, maxPts) {
+    var el = document.querySelector('.' + className);
+    if (!el) return null;
+    var raw = el.getAttribute('points');
+    if (!raw) return null;
+    var pairs = raw.trim().split(/\s+/);
+    // Strip baseline bookend points (first "0,50" and last "130,50")
+    var yVals = [];
+    for (var i = 1; i < pairs.length - 1; i++) {
+      var parts = pairs[i].split(',');
+      if (parts.length === 2) yVals.push(parseFloat(parts[1]));
+    }
+    if (yVals.length === 0) return null;
+    // Downsample
+    var step = Math.max(1, Math.floor(yVals.length / maxPts));
+    var sampled = [];
+    for (var i = 0; i < yVals.length; i += step) {
+      // Normalize: y=0 → 99 (max), y=50 → 0 (zero speed)
+      var n = Math.round((1 - yVals[i] / 50) * 99);
+      if (n < 0) n = 0; if (n > 99) n = 99;
+      sampled.push(n);
+    }
+    return sampled;
+  }
+
   function shareResults() {
     var d = document.getElementById('downResult').textContent;
     var u = document.getElementById('upRestxt').textContent;
     var p = document.getElementById('pingResult').textContent;
     var j = document.getElementById('jitterDesk').textContent;
-    var data = JSON.stringify({
+    var obj = {
       d: d, u: u, p: p, j: j,
       ua: navigator.userAgent,
       t: new Date().toISOString()
-    });
+    };
+    var dlGraph = extractGraph('line', 25);
+    var ulGraph = extractGraph('line2', 25);
+    if (dlGraph) obj.dg = dlGraph;
+    if (ulGraph) obj.ug = ulGraph;
+    var data = JSON.stringify(obj);
     var encoded = btoa(data);
     var url = location.origin + location.pathname + '#results=' + encodeURIComponent(encoded);
     var btn = document.getElementById('shareBtn');
@@ -169,6 +201,35 @@ function ostOnload() {
     } else {
       prompt('Copy this link:', url);
     }
+  }
+
+  // Rebuild a polygon points string from normalized 0-99 values
+  function buildGraphPoints(vals) {
+    if (!vals || vals.length === 0) return null;
+    var pts = '0,50 ';
+    var step = 130 / (vals.length - 1 || 1);
+    for (var i = 0; i < vals.length; i++) {
+      var x = (step * i).toFixed(2);
+      var y = (50 * (1 - vals[i] / 99)).toFixed(2);
+      pts += x + ',' + y + ' ';
+    }
+    pts += '130,50';
+    return pts;
+  }
+
+  function renderSharedGraph(symbolId, className, vals) {
+    if (!vals) return;
+    var pts = buildGraphPoints(vals);
+    if (!pts) return;
+    var sym = document.getElementById(symbolId);
+    if (!sym) return;
+    // Remove existing placeholder polygon
+    var old = sym.querySelector('.' + className);
+    if (old) old.parentNode.removeChild(old);
+    var poly = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    poly.setAttribute('points', pts);
+    poly.setAttribute('class', className);
+    sym.appendChild(poly);
   }
 
   function displaySharedResults(data) {
@@ -204,6 +265,10 @@ function ostOnload() {
     if (statusEl && data.t) {
       statusEl.textContent = new Date(data.t).toLocaleString();
     }
+
+    // Render shared graphs
+    renderSharedGraph('graphc1', 'line', data.dg);
+    renderSharedGraph('graphc2', 'line2', data.ug);
 
     var postActions = document.getElementById('postTestActions');
     if (postActions) {
