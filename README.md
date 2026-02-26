@@ -21,6 +21,8 @@ Then open `http://<host>:3000`.
 
 If you run it behind a reverse proxy, increase the max POST body size to 35 megabytes.
 
+The user ID is `101`.
+
 ## License
 
 MIT — see [LICENSE.md](LICENSE.md).
