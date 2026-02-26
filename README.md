@@ -19,6 +19,8 @@ docker run -d -p 3000:3000 openspeedtest
 
 Then open `http://<host>:3000`.
 
+If you run it behind a reverse proxy, increase the max POST body size to 35 megabytes.
+
 ## License
 
 MIT — see [LICENSE.md](LICENSE.md).
