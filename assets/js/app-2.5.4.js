@@ -10,7 +10,11 @@ window.onload = function() {
   var appSVG = document.getElementById("OpenSpeedTest-UI");
   appSVG.parentNode.replaceChild(appSVG.contentDocument.documentElement, appSVG);
   ostOnload();
-  OpenSpeedTest.Start();
+  if (!window.sharedResultsData) {
+    OpenSpeedTest.Start();
+  } else {
+    displaySharedResults(window.sharedResultsData);
+  }
 };
 (function(OpenSpeedTest) {
   var Status;
@@ -62,8 +66,6 @@ window.onload = function() {
     this.upSymbolDesk = _("upSymbolDesk");
     this.upSymbolMob = _("upSymbolMob");
     this.downSymbolMob = _("downSymbolMob");
-    this.settingsMob = _("settingsMob");
-    this.settingsDesk = _("settingsDesk");
     this.oDoLiveStatus = _("oDoLiveStatus");
     this.ConnectErrorMob = _("ConnectErrorMob");
     this.ConnectErrorDesk = _("ConnectErrorDesk");
@@ -589,8 +591,6 @@ window.onload = function() {
     setFinal();
     var launch = true;
     var init = true;
-    Get.addEvt(Show.settingsMob.el, "click", ShowIP);
-    Get.addEvt(Show.settingsDesk.el, "click", ShowIP);
     Get.addEvt(Show.startButtonDesk.el, "click", runTasks);
     Get.addEvt(Show.startButtonMob.el, "click", runTasks);
     Get.addEvt(document, "keypress", hiEnter);
@@ -800,8 +800,6 @@ window.onload = function() {
     }
     var Startit = 0;
     function removeEvts() {
-      Get.remEvt(Show.settingsMob.el, "click", ShowIP);
-      Get.remEvt(Show.settingsDesk.el, "click", ShowIP);
       Get.remEvt(Show.startButtonDesk.el, "click", runTasks);
       Get.remEvt(Show.startButtonMob.el, "click", runTasks);
       Get.remEvt(document, "keypress", hiEnter);
@@ -996,34 +994,17 @@ window.onload = function() {
           Show.ConnectionError();
           Status = "busy";
           clearInterval(Engine);
-          var dummyElement = document.createElement("div");
-          dummyElement.innerHTML = '<a xlink:href="https://openspeedtest.com/FAQ.php?ref=NetworkError" style="cursor: pointer" target="_blank"></a>';
-          var htmlAnchorElement = dummyElement.querySelector("a");
           Show.oDoLiveSpeed.el.textContent = "Network Error";
-          var circleSVG = document.getElementById("oDoLiveSpeed");
-          htmlAnchorElement.innerHTML = circleSVG.innerHTML;
-          circleSVG.innerHTML = dummyElement.innerHTML;
         }
         if (Status === "SendR") {
           Show.showStatus("All done");
-          var dummyElement = document.createElement("div");
-          dummyElement.innerHTML = '<a xlink:href="https://openspeedtest.com?ref=Self-Hosted-Outro&run=5" style="cursor: pointer" target="_blank"></a>';
-          var htmlAnchorElement = dummyElement.querySelector("a");
-          Show.oDoLiveSpeed.el.textContent = ost;
-          var circleSVG = document.getElementById("oDoLiveSpeed");
-          htmlAnchorElement.innerHTML = circleSVG.innerHTML;
-          circleSVG.innerHTML = dummyElement.innerHTML;
-          if (location.hostname != myname.toLowerCase() + com) {
-            saveTestData = "https://" + myname.toLowerCase() + com + "/results/show.php?" + "&d=" + downloadSpeed.toFixed(3) + "&u=" + uploadSpeed.toFixed(3) + "&p=" + pingEstimate + "&j=" + jitterEstimate + "&dd=" + (dataUsedfordl / 1048576).toFixed(3) + "&ud=" + (dataUsedforul / 1048576).toFixed(3) + "&ua=" + userAgentString;
-            saveTestData = encodeURI(saveTestData);
-            var circleSVG2 = document.getElementById("resultsData");
-            circleSVG2.setAttributeNS("http://www.w3.org/1999/xlink", "xlink:href", saveTestData);
-            circleSVG2.setAttribute("target", "_blank");
-            if (saveData) {
-              ServerConnect(5);
-            }
-          } else {
-            ServerConnect(3);
+          Show.oDoLiveSpeed.el.textContent = "Done";
+          if (saveData) {
+            ServerConnect(5);
+          }
+          var postActions = document.getElementById("postTestActions");
+          if (postActions) {
+            postActions.style.display = "flex";
           }
           Status = "busy";
           clearInterval(Engine);

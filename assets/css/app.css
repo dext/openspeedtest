@@ -63,7 +63,7 @@ font-weight: 500;
   color: rgb(113, 113, 113);
 }
 .Credits a:hover {
-color: #14b0fe;
+color: #FF5A02;
 }
 
 .ConnectError {
@@ -186,7 +186,7 @@ color: #14b0fe;
 }
 
 .intro-Progress {
-  stroke: #56c4fb;
+  stroke: #FF8A3D;
   stroke-width: 8px;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -194,7 +194,7 @@ color: #14b0fe;
   stroke-dashoffset: 0;
 }
 .progressElmstart {
-  stroke: #56c4fb;
+  stroke: #FF8A3D;
   stroke-width: 8px;
   stroke-linecap: round;
   stroke-linejoin: round;
@@ -246,19 +246,19 @@ color: #14b0fe;
   text-anchor: end;
 }
 #upSymbolDesk {
-  fill: #14b0fe;
+  fill: #FF5A02;
   display: none;
 }
 #downSymbolDesk {
-  fill: #14b0fe;
+  fill: #FF5A02;
   display: none;
 }
 #upSymbolMob {
-  fill: #14b0fe;
+  fill: #FF5A02;
   display: none;
 }
 #downSymbolMob {
-  fill: #14b0fe;
+  fill: #FF5A02;
   display: none;
 }
 
@@ -290,7 +290,7 @@ color: #14b0fe;
 .spinner > div {
   width: 20px;
   height: 20px;
-  background-color: #2196f3;
+  background-color: #FF5A02;
 
   border-radius: 100%;
   display: inline-block;
@@ -332,6 +332,19 @@ color: #14b0fe;
   }
 }
 
+.introText {
+  font-size: 16px;
+  fill: #333;
+  font-family: Roboto-Medium, Roboto;
+  font-weight: 500;
+}
+.introTextSub {
+  font-size: 12px;
+  fill: #777;
+  font-family: Roboto-Medium, Roboto;
+  font-weight: 500;
+}
+
 .darkmode {
   margin-bottom: -15px;
   fill: #75757a99;
@@ -340,7 +353,7 @@ color: #14b0fe;
   cursor: pointer;
   margin-right: 30px;
 }
-#daymode {
+#daymode, #daymode-UI, #daymode-UI-Mob {
   margin-right: 40px;
 }
 .darkmode:hover {
@@ -375,6 +388,31 @@ color: #14b0fe;
     visibility: hidden;
   }
 }
+#postTestActions {
+  position: fixed;
+  bottom: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  display: flex;
+  gap: 10px;
+}
+.action-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, #FF8A3D, #FF5A02);
+  color: #fff;
+  font-family: Roboto-Medium, Roboto;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.action-btn:hover {
+  opacity: 0.85;
+}
+
 @media only screen and (max-width: 300px) {
   .Credits{
     display: none;

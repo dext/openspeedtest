@@ -10,7 +10,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta property="og:image" content="assets/images/img.png" />
-  <link rel='canonical' href='https://openspeedtest.com'/>
+
   <link rel="apple-touch-icon" sizes="180x180" href="assets/images/icons/apple-touch-icon.png">
   <link rel="icon" type="image/png" sizes="32x32" href="assets/images/icons/favicon-32x32.png">
   <link rel="icon" type="image/png" sizes="16x16" href="assets/images/icons/favicon-16x16.png">
@@ -136,6 +136,83 @@ function ostOnload() {
   
   var openChannel = "dev";
 
+  // Parse shared results from URL hash
+  var sharedResultsData = null;
+  (function() {
+    if (location.hash.indexOf('#results=') === 0) {
+      try {
+        sharedResultsData = JSON.parse(atob(decodeURIComponent(location.hash.substring(9))));
+      } catch(e) {}
+    }
+  })();
+
+  function shareResults() {
+    var d = document.getElementById('downResult').textContent;
+    var u = document.getElementById('upRestxt').textContent;
+    var p = document.getElementById('pingResult').textContent;
+    var j = document.getElementById('jitterDesk').textContent;
+    var data = JSON.stringify({
+      d: d, u: u, p: p, j: j,
+      ua: navigator.userAgent,
+      t: new Date().toISOString()
+    });
+    var encoded = btoa(data);
+    var url = location.origin + location.pathname + '#results=' + encodeURIComponent(encoded);
+    var btn = document.getElementById('shareBtn');
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(function() {
+        btn.textContent = 'Copied!';
+        setTimeout(function() { btn.textContent = 'Copy Share Link'; }, 2000);
+      }, function() {
+        prompt('Copy this link:', url);
+      });
+    } else {
+      prompt('Copy this link:', url);
+    }
+  }
+
+  function displaySharedResults(data) {
+    var loader = document.getElementById('loading_app');
+    if (loader) loader.style.display = 'none';
+
+    var svg = document.getElementById('OpenSpeedtest');
+    if (svg) { svg.style.display = 'block'; svg.style.visibility = 'visible'; svg.style.opacity = '1'; }
+
+    var introDesk = document.getElementById('intro-Desk');
+    var introMob = document.getElementById('intro-Mob');
+    var uiDesk = document.getElementById('UI-Desk');
+    var uiMob = document.getElementById('UI-Mob');
+
+    if (introDesk) introDesk.style.display = 'none';
+    if (introMob) introMob.style.display = 'none';
+    if (uiDesk) { uiDesk.style.display = 'block'; uiDesk.style.opacity = '1'; }
+    if (uiMob) { uiMob.style.display = 'block'; uiMob.style.opacity = '1'; }
+
+    var setResult = function(id, val) {
+      var el = document.getElementById(id);
+      if (el) el.textContent = val;
+    };
+    setResult('downResult', data.d);
+    setResult('upRestxt', data.u);
+    setResult('pingResult', data.p);
+    setResult('jitterDesk', data.j);
+    setResult('pingMobres', data.p);
+    setResult('JitterResultMon', data.j);
+    setResult('oDoLiveSpeed', 'Shared Result');
+
+    var statusEl = document.getElementById('oDoLiveStatus');
+    if (statusEl && data.t) {
+      statusEl.textContent = new Date(data.t).toLocaleString();
+    }
+
+    var postActions = document.getElementById('postTestActions');
+    if (postActions) {
+      postActions.style.display = 'flex';
+      var shareBtn = document.getElementById('shareBtn');
+      if (shareBtn) shareBtn.textContent = 'Copy Link';
+    }
+  }
+
   </script>
 
 <!--
@@ -154,13 +231,17 @@ please get in touch with support@openspeedtest.com.
     <div class="bounce3"></div>
   </div>
   <object style="visibility:hidden" id="OpenSpeedTest-UI" data="assets/images/app.svg" type="image/svg+xml"></object>
- 
+
+  <div id="postTestActions" style="display:none;">
+    <button id="shareBtn" class="action-btn" onclick="shareResults()">Copy Share Link</button>
+    <button id="newTestBtn" class="action-btn" onclick="location.href=location.pathname">Run New Test</button>
+  </div>
+
   <div class="Credits">
-    <a href="https://openspeedtest.com?ref=Self-Hosted&Run">SpeedTest by OpenSpeedTest™</a> is a Free and <a href="https://github.com/openspeedtest/Speed-Test">Open-Source HTML5 Network Speed Test</a> Software.
-    <p style="font-size: 12px;">&copy; Copyright 2013-2024 OpenSpeedTest™ All Rights Reserved.</p>
+    Based on <a href="https://github.com/openspeedtest/Speed-Test" rel="nofollow">OpenSpeedTest</a>
 </div>
   
-  <script src="assets/js/app-2.5.4.min.js"></script>
+  <script src="assets/js/app-2.5.4.js"></script>
   <script src="assets/js/darkmode.js"></script>
 
 </body>

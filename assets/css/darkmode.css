@@ -40,6 +40,16 @@ body {
   fill: #ffffff;
 }
 
+.introText {
+  fill: #ffffff;
+}
+.introTextSub {
+  fill: #aaaaaa;
+}
+
 .ConnectError {
   fill: #ffffff;
+}
+.action-btn {
+  background: linear-gradient(135deg, #FF5A02, #CC4800);
 }
