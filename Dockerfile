@@ -1,4 +1,4 @@
-FROM nginxinc/nginx-unprivileged:1.29-alpine3.23-slim
+FROM rbdr.io/public/nginx-unprivileged:1.29-alpine3.23-slim
 
 COPY nginx.conf /etc/nginx/nginx.conf
 COPY downloading /usr/share/nginx/html/
